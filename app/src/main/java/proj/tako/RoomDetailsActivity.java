@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -53,6 +54,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
   Reservation currReservation;
   ExpandableGridView gridViewEquipment;
   String eventDate, timeStart, timeEnd;
+  LinearLayout llRoomsEquip;
 
 
   ArrayList<Equipment> equipments;
@@ -65,6 +67,9 @@ public class RoomDetailsActivity extends AppCompatActivity {
     setContentView(R.layout.activity_room_details);
 
     loading = (RelativeLayout)findViewById(R.id.loading_layout);
+    llRoomsEquip = (LinearLayout)findViewById(R.id.ll_rooms_equip);
+    llRoomsEquip.setVisibility(View.GONE);
+
     gridViewEquipment = (ExpandableGridView)findViewById(R.id.gridViewEquipment);
     gridViewEquipment.setExpanded(true);
     restService = new RestService();
@@ -144,6 +149,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
     etContactNumber = (EditText) findViewById(R.id.et_contact_number);
 
     rooms = new ArrayList<Room>();
+    equipments = new ArrayList<Equipment>();
 
 
   }
@@ -281,6 +287,8 @@ public class RoomDetailsActivity extends AppCompatActivity {
     //clean up equipments;
     gridViewEquipment.setAdapter(new EquipmentAdapter());
     loading.setVisibility(View.GONE);
+    llRoomsEquip.setVisibility(View.VISIBLE);
+
 
   }
 
@@ -464,6 +472,8 @@ public class RoomDetailsActivity extends AppCompatActivity {
     spinnerRooms = setUpSpinner(R.id.spinner_rooms, new String[0]);
     equipments.clear();
     setUpGridView();
+    llRoomsEquip.setVisibility(View.GONE);
+
   }
 
   @Override
