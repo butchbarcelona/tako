@@ -19,6 +19,6 @@ public class Room {
     this.reservations = reservations;
   }
 
-  
+
 
 }

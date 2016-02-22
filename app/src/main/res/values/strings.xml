@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">tako</string>
+    <string name="app_name">MTC Reservation</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
