@@ -1,8 +1,5 @@
 package proj.tako.models;
 
-/**
- * Created by mbarcelona on 2/22/16.
- */
 public class User {
 
   String username, firstname, lastname, middlename, account, email;

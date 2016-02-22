@@ -1,8 +1,5 @@
 package proj.tako.models;
 
-/**
- * Created by mbarcelona on 2/21/16.
- */
 public class Reservation {
 
   String start;

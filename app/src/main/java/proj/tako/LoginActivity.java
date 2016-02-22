@@ -179,7 +179,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
       focusView = emailView;
       cancel = true;
     } else if (!isEmailValid(email)) {
-      emailView.setError(getString(R.string.error_invalid_email));
+      emailView.setError(getString(R.string.error_invalid_username));
       focusView = emailView;
       cancel = true;
     }

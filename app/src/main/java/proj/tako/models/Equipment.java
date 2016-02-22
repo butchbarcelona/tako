@@ -1,8 +1,5 @@
 package proj.tako.models;
 
-/**
- * Created by mbarcelona on 2/22/16.
- */
 public class Equipment {
 
   String name;

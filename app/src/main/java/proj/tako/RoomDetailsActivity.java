@@ -6,10 +6,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -33,6 +37,7 @@ import java.util.Locale;
 
 import proj.tako.models.Equipment;
 import proj.tako.models.Reservation;
+import proj.tako.models.Room;
 import proj.tako.models.User;
 import proj.tako.services.RestCalls;
 import proj.tako.services.RestService;
@@ -49,6 +54,9 @@ public class RoomDetailsActivity extends AppCompatActivity {
   ExpandableGridView gridViewEquipment;
   String eventDate, timeStart, timeEnd;
 
+
+  ArrayList<Equipment> equipments;
+  ArrayList<Room> rooms;
   RestService restService;
 
   @Override
@@ -74,40 +82,52 @@ public class RoomDetailsActivity extends AppCompatActivity {
               intent.getIntExtra("course_id", -1));
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    toolbar.setTitle("Hi ");
-    toolbar.setSubtitle(currUser.getFirstname());
+    toolbar.setTitle("MTC Reservation ");
+    toolbar.setSubtitle("Hi "+currUser.getFirstname());
     setSupportActionBar(toolbar);
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
-      public void onClick(View view) {
-/*        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-          .setAction("Action", null).show();*/
+      public void onClick(final View view) {
 
-        ArrayList<Equipment> equipments = new ArrayList<Equipment>();
+        if (etEvent.getText().toString().isEmpty()) {
+          Snackbar.make(view, "Event name is empty", Snackbar.LENGTH_SHORT).show();
+        } else {
 
+          ArrayList<Equipment> equips = new ArrayList<Equipment>();
 
-        restService.reserveRoom(new RestService.RestServiceListener() {
-          @Override
-          public void onSuccess(RestCalls callType, String string) {
-
+          for(Equipment e: equipments){
+            if(e.getReserved() > 0){
+              equips.add(e);
+            }
           }
 
-          @Override
-          public void onFailure(RestCalls callType, String string) {
 
-          }
-        }, currUser.getId()+""
-          ,currReservation.getDate()
-          , currReservation.getStart()
-          , currReservation.getEnd()
-        , etEvent.getText().toString()
-        , etPurpose.getText().toString()
-        , etNumAttendees.getText().toString()
-        , etContactNumber.getText().toString()
-        , null//equipments
-        , spinnerRooms.getSelectedItem().toString());
+
+          restService.reserveRoom(new RestService.RestServiceListener() {
+            @Override
+            public void onSuccess(RestCalls callType, String string) {
+              Snackbar.make(view, "Room reservation is pending for approval.", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+            }
+
+            @Override
+            public void onFailure(RestCalls callType, String string) {
+              Snackbar.make(view, "Could not connect to the server.", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+            }
+          }, currUser.getId() + ""
+            , currReservation.getDate()
+            , currReservation.getStart()
+            , currReservation.getEnd()
+            , etEvent.getText().toString()
+            , etPurpose.getText().toString()
+            , etNumAttendees.getText().toString()
+            , etContactNumber.getText().toString()
+            , equips
+            , Room.lookForRoom(spinnerRooms.getSelectedItem().toString(),rooms).getId()+"");
+        }
       }
     });
 
@@ -122,11 +142,11 @@ public class RoomDetailsActivity extends AppCompatActivity {
     etContactNumber = (EditText) findViewById(R.id.et_contact_number);
     etContactNumber = (EditText) findViewById(R.id.et_contact_number);
 
+    rooms = new ArrayList<Room>();
 
 
   }
 
-  Equipment[] equipments;
   public void populateEquipmentCount(){
 
     Log.d(MainActivity.TAG, "populateEquipmentCount");
@@ -181,12 +201,12 @@ public class RoomDetailsActivity extends AppCompatActivity {
           try {
             result = new JSONArray(string);
 
-            equipments = new Equipment[result.length()];
+            equipments = new ArrayList<Equipment>();//new Equipment[result.length()];
             for (int i = 0; i < result.length(); i++) {
               final JSONObject data = result.getJSONObject(i);
               int id = data.getInt("id");
 
-              equipments[i] = new Equipment(id, data.getString("venueOrEquipment"), -1);
+              equipments.add( new Equipment(id, data.getString("venueOrEquipment"), -1));
             }
             populateEquipmentCount();
 
@@ -215,6 +235,13 @@ public class RoomDetailsActivity extends AppCompatActivity {
             for (int i = 0; i < result.length(); i++) {
               JSONObject data = result.getJSONObject(i);
               arrRooms[i] = data.getString("venueOrEquipment");
+
+              Room room = new Room(data.getInt("id")
+                ,data.getString("venueOrEquipment")
+                ,data.getString("details")
+                ,data.getString("serial"));
+
+              rooms.add(room);
             }
 
             spinnerRooms = setUpSpinner(R.id.spinner_rooms, arrRooms);
@@ -278,7 +305,10 @@ public class RoomDetailsActivity extends AppCompatActivity {
             newDate.set(year, monthOfYear, dayOfMonth);
             String date = formatter.format(newDate.getTime());
             et.setText(date);
-            currReservation.setDate(date.replace("/", "-"));
+
+            final SimpleDateFormat formatter2;
+            formatter2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            currReservation.setDate(formatter2.format(newDate.getTime()));
 
             getRooms();
           }
@@ -328,10 +358,10 @@ public class RoomDetailsActivity extends AppCompatActivity {
 
             et.setText(hour + ":" + min + " " + ampm);
 
-            switch(et.getId()){
+            switch (et.getId()) {
               case R.id.et_time_end:
-                  currReservation.setEnd(((hourOfDay < 10)?"0"+hourOfDay:hourOfDay)
-                    +":"+min+":00");
+                currReservation.setEnd(((hourOfDay < 10) ? "0" + hourOfDay : hourOfDay)
+                  + ":" + min + ":00");
                 getRooms();
                 break;
               case R.id.et_time_start:
@@ -361,20 +391,18 @@ public class RoomDetailsActivity extends AppCompatActivity {
 
   public class EquipmentAdapter extends BaseAdapter{
 
-
-
     public EquipmentAdapter(){
 
     }
 
     @Override
     public int getCount() {
-      return equipments.length;
+      return equipments.size();
     }
 
     @Override
     public Object getItem(int position) {
-      return equipments[position];
+      return equipments.get(position);
     }
 
     @Override
@@ -383,22 +411,49 @@ public class RoomDetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
       View view = getLayoutInflater().inflate(R.layout.list_equipment_item,null);
 
       TextView tvEquipment = (TextView)view.findViewById(R.id.tvEquipment);
-      tvEquipment.setText(equipments[position].getName());
+      tvEquipment.setText(equipments.get(position).getName());
 
       NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
       numberPicker.setMinValue(0);
-      numberPicker.setMaxValue(equipments[position].getNumAvailable());
-      numberPicker.setValue(1);
+      numberPicker.setMaxValue(equipments.get(position).getNumAvailable());
+      numberPicker.setValue(0);
+      numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+        @Override
+        public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+          equipments.get(position).setReserved(newVal);
+        }
+      });
 
       EditText etNum = (EditText)view.findViewById(R.id.et_num);
-      etNum.setText(equipments[position].getNumAvailable()+"");
+      etNum.setText(equipments.get(position).getNumAvailable() + "");
 
       return view;
     }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle item selection
+   /* switch (item.getItemId()) {
+      case R.id.settings_menu:
+        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+        break;
+    }*/
+
+    return true;
+  }
+
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    super.onCreateOptionsMenu(menu);
+    MenuInflater mi = getMenuInflater();
+    mi.inflate(R.menu.menu_room_details, menu);
+    return true;
   }
 }

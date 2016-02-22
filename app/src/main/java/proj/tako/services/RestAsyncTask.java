@@ -2,9 +2,6 @@ package proj.tako.services;
 
 import android.os.AsyncTask;
 
-/**
- * Created by mbarcelona on 12/9/15.
- */
 public class RestAsyncTask extends AsyncTask<Void, Void, Void> {
   RestAsyncTaskListener listener;
   public RestAsyncTask(RestAsyncTaskListener listener) {
