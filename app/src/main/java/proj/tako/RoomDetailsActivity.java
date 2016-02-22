@@ -97,7 +97,17 @@ public class RoomDetailsActivity extends AppCompatActivity {
       public void onClick(final View view) {
 
         if (etEvent.getText().toString().isEmpty()) {
-          Snackbar.make(view, "Event name is empty", Snackbar.LENGTH_SHORT).show();
+          Snackbar.make(view, "Event name is empty.", Snackbar.LENGTH_SHORT).show();
+        } else if (etDate.getText().toString().isEmpty()) {
+          Snackbar.make(view, "Date is empty.", Snackbar.LENGTH_SHORT).show();
+        } else if (etTimeEnd.getText().toString().isEmpty() || etTimeStart.getText().toString().isEmpty()) {
+          Snackbar.make(view, "Time range is not complete.", Snackbar.LENGTH_SHORT).show();
+        } else if (etNumAttendees.getText().toString().isEmpty()) {
+          Snackbar.make(view, "Number of attendees is needed.", Snackbar.LENGTH_SHORT).show();
+        } else if (etPurpose.getText().toString().isEmpty()) {
+          Snackbar.make(view, "Please describe this event's purpose.", Snackbar.LENGTH_SHORT).show();
+        } else if (etContactNumber.getText().toString().isEmpty()) {
+          Snackbar.make(view, "Contact number is empty", Snackbar.LENGTH_SHORT).show();
         } else {
 
           ArrayList<Equipment> equips = new ArrayList<Equipment>();
@@ -189,7 +199,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
         }
       }
     }
-    if (finished) {
+    if (finished && !equipments.isEmpty()) {
       setUpGridView();
     }
   }
@@ -424,9 +434,11 @@ public class RoomDetailsActivity extends AppCompatActivity {
       TextView tvEquipment = (TextView)view.findViewById(R.id.tvEquipment);
       tvEquipment.setText(equipments.get(position).getName());
 
+      int max = equipments.get(position).getNumAvailable();
+
       NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
       numberPicker.setMinValue(0);
-      numberPicker.setMaxValue(equipments.get(position).getNumAvailable());
+      numberPicker.setMaxValue((max < 0)?0:max);
       numberPicker.setValue(0);
       numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
         @Override
@@ -467,6 +479,8 @@ public class RoomDetailsActivity extends AppCompatActivity {
     etPurpose.setText("");
     etContactNumber.setText("");
     etEvent.setText("");
+
+    currReservation = new Reservation();
 
     rooms.clear();
     spinnerRooms = setUpSpinner(R.id.spinner_rooms, new String[0]);
