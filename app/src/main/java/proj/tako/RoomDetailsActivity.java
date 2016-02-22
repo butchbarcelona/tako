@@ -110,6 +110,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
             public void onSuccess(RestCalls callType, String string) {
               Snackbar.make(view, "Room reservation is pending for approval.", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+              resetFields();
             }
 
             @Override
@@ -278,9 +279,6 @@ public class RoomDetailsActivity extends AppCompatActivity {
     Log.d(MainActivity.TAG, "Set up grid view");
 
     //clean up equipments;
-
-
-
     gridViewEquipment.setAdapter(new EquipmentAdapter());
     loading.setVisibility(View.GONE);
 
@@ -439,15 +437,34 @@ public class RoomDetailsActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     // Handle item selection
-   /* switch (item.getItemId()) {
-      case R.id.settings_menu:
-        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+    switch (item.getItemId()) {
+      case R.id.action_reset:
+        resetFields();
         break;
-    }*/
+      case R.id.action_logout:
+        Intent intent = new Intent(RoomDetailsActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+        break;
+    }
 
     return true;
   }
 
+  public void resetFields(){
+    etDate.setText("");
+    etTimeStart.setText("");
+    etTimeEnd.setText("");
+    etNumAttendees.setText("");
+    etPurpose.setText("");
+    etContactNumber.setText("");
+    etEvent.setText("");
+
+    rooms.clear();
+    spinnerRooms = setUpSpinner(R.id.spinner_rooms, new String[0]);
+    equipments.clear();
+    setUpGridView();
+  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
