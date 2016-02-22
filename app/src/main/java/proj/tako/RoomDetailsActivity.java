@@ -6,17 +6,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -28,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -37,15 +37,16 @@ import proj.tako.models.User;
 import proj.tako.services.RestCalls;
 import proj.tako.services.RestService;
 import proj.tako.services.Util;
+import proj.tako.view.ExpandableGridView;
 
 public class RoomDetailsActivity extends AppCompatActivity {
 
   public User currUser;
-  EditText etDate, etTimeStart, etTimeEnd, etNumAttendees, etPurpose, etContactNumber;
+  EditText etDate, etTimeStart, etTimeEnd, etNumAttendees, etPurpose, etContactNumber, etEvent;
   Spinner spinnerRooms;
   RelativeLayout loading;
   Reservation currReservation;
-  GridView gridViewEquipment;
+  ExpandableGridView gridViewEquipment;
   String eventDate, timeStart, timeEnd;
 
   RestService restService;
@@ -56,7 +57,8 @@ public class RoomDetailsActivity extends AppCompatActivity {
     setContentView(R.layout.activity_room_details);
 
     loading = (RelativeLayout)findViewById(R.id.loading_layout);
-    gridViewEquipment = (GridView)findViewById(R.id.gridViewEquipment);
+    gridViewEquipment = (ExpandableGridView)findViewById(R.id.gridViewEquipment);
+    gridViewEquipment.setExpanded(true);
     restService = new RestService();
     currReservation = new Reservation();
 
@@ -80,8 +82,32 @@ public class RoomDetailsActivity extends AppCompatActivity {
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-          .setAction("Action", null).show();
+/*        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+          .setAction("Action", null).show();*/
+
+        ArrayList<Equipment> equipments = new ArrayList<Equipment>();
+
+
+        restService.reserveRoom(new RestService.RestServiceListener() {
+          @Override
+          public void onSuccess(RestCalls callType, String string) {
+
+          }
+
+          @Override
+          public void onFailure(RestCalls callType, String string) {
+
+          }
+        }, currUser.getId()+""
+          ,currReservation.getDate()
+          , currReservation.getStart()
+          , currReservation.getEnd()
+        , etEvent.getText().toString()
+        , etPurpose.getText().toString()
+        , etNumAttendees.getText().toString()
+        , etContactNumber.getText().toString()
+        , null//equipments
+        , spinnerRooms.getSelectedItem().toString());
       }
     });
 
@@ -90,7 +116,11 @@ public class RoomDetailsActivity extends AppCompatActivity {
     etTimeEnd = setUpTimePickerDialog(R.id.et_time_end);
     etTimeStart = setUpTimePickerDialog(R.id.et_time_start);
     //spinnerRooms.setVisibility(View.GONE);
-
+    etNumAttendees = (EditText) findViewById(R.id.et_attendees);
+    etEvent = (EditText) findViewById(R.id.et_event);
+    etPurpose = (EditText) findViewById(R.id.et_purpose);
+    etContactNumber = (EditText) findViewById(R.id.et_contact_number);
+    etContactNumber = (EditText) findViewById(R.id.et_contact_number);
 
 
 
@@ -98,6 +128,8 @@ public class RoomDetailsActivity extends AppCompatActivity {
 
   Equipment[] equipments;
   public void populateEquipmentCount(){
+
+    Log.d(MainActivity.TAG, "populateEquipmentCount");
     for(final Equipment e: equipments) {
       //gets the equipment
       if(e != null) {
@@ -106,20 +138,13 @@ public class RoomDetailsActivity extends AppCompatActivity {
           public void onSuccess(RestCalls callType, String string) {
             e.setNumAvailable(Integer.parseInt(string.replace("[", "").replace("]", "")));
 
-            boolean finished = true;
-            for (final Equipment e : equipments) {
-              if (e.getNumAvailable() == -1) {
-                finished = false;
-              }
-            }
-            if (finished) {
-              setUpGridView();
-            }
+            checkIfFinished();
           }
 
           @Override
           public void onFailure(RestCalls callType, String string) {
             e.setNumAvailable(0);
+            checkIfFinished();
           }
         }, currReservation.getDate()
           , currReservation.getStart()
@@ -128,6 +153,19 @@ public class RoomDetailsActivity extends AppCompatActivity {
     }
   }
 
+  public void checkIfFinished(){
+    boolean finished = true;
+    for (final Equipment e : equipments) {
+      if(e != null) {
+        if (e.getNumAvailable() == -1) {
+          finished = false;
+        }
+      }
+    }
+    if (finished) {
+      setUpGridView();
+    }
+  }
 
 
   public void getRooms(){
@@ -143,11 +181,11 @@ public class RoomDetailsActivity extends AppCompatActivity {
           try {
             result = new JSONArray(string);
 
+            equipments = new Equipment[result.length()];
             for (int i = 0; i < result.length(); i++) {
               final JSONObject data = result.getJSONObject(i);
               int id = data.getInt("id");
 
-              equipments = new Equipment[result.length()];
               equipments[i] = new Equipment(id, data.getString("venueOrEquipment"), -1);
             }
             populateEquipmentCount();
@@ -210,6 +248,12 @@ public class RoomDetailsActivity extends AppCompatActivity {
   }
 
   public void setUpGridView(){
+    Log.d(MainActivity.TAG, "Set up grid view");
+
+    //clean up equipments;
+
+
+
     gridViewEquipment.setAdapter(new EquipmentAdapter());
     loading.setVisibility(View.GONE);
 
@@ -325,17 +369,17 @@ public class RoomDetailsActivity extends AppCompatActivity {
 
     @Override
     public int getCount() {
-      return 0;
+      return equipments.length;
     }
 
     @Override
     public Object getItem(int position) {
-      return null;
+      return equipments[position];
     }
 
     @Override
     public long getItemId(int position) {
-      return 0;
+      return position;
     }
 
     @Override
@@ -343,13 +387,16 @@ public class RoomDetailsActivity extends AppCompatActivity {
 
       View view = getLayoutInflater().inflate(R.layout.list_equipment_item,null);
 
-      TextView tvEquipment = (TextView)view.findViewById(R.id.chkBox);
+      TextView tvEquipment = (TextView)view.findViewById(R.id.tvEquipment);
       tvEquipment.setText(equipments[position].getName());
 
       NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
       numberPicker.setMinValue(0);
       numberPicker.setMaxValue(equipments[position].getNumAvailable());
-      numberPicker.setValue(0);
+      numberPicker.setValue(1);
+
+      EditText etNum = (EditText)view.findViewById(R.id.et_num);
+      etNum.setText(equipments[position].getNumAvailable()+"");
 
       return view;
     }

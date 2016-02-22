@@ -8,6 +8,7 @@ public class Equipment {
   String name;
   int numAvailable;
   int id;
+  int reserved;
 
   public Equipment(int id, String name, int numAvailable){
     this.name = name;
@@ -16,6 +17,14 @@ public class Equipment {
 
   }
 
+
+  public int getReserved() {
+    return reserved;
+  }
+
+  public void setReserved(int reserved) {
+    this.reserved = reserved;
+  }
 
   public int getId() {
     return id;

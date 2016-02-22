@@ -2,25 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New CheckBox"
-        android:id="@+id/chkBox"
-        android:checked="false"/>
+              android:layout_height="wrap_content"
+    android:padding="5dp"
+              android:weightSum="1">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/tvEquipment"/>
+        android:padding="10dp"
+        android:id="@+id/tvEquipment"
+        android:layout_gravity="center_horizontal" />
 
     <NumberPicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/numberPicker"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:scaleX=".7"
+        android:scaleY=".7"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/et_num"
         android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

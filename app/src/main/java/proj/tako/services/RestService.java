@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import proj.tako.MainActivity;
+import proj.tako.models.Equipment;
 import proj.tako.models.NameValuePair;
 
 /**
@@ -165,6 +166,78 @@ public class RestService {
         @Override
         public void doInBackground() {
           jsonResults = get(getPath, "GET", params);
+        }
+
+        @Override
+        public void result() {
+
+          if (jsonResults == null || jsonResults.trim().isEmpty()) {
+            listener.onFailure(RestCalls.GET_NUM_EQUIPMENT, "failed");
+          } else {
+            listener.onSuccess(RestCalls.GET_NUM_EQUIPMENT, jsonResults);
+          }
+
+        }
+      }).execute();
+
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+  }
+  public void reserveRoom(final RestServiceListener listener, String userId, String date
+    , String timeStart, String timeEnd, String event, String purpose, String attendants
+    , String contactNumber, ArrayList<Equipment> equipments, String venue){
+
+    /**
+     * dateStart, timeStart,
+     timeEnd,
+     * venue,
+     attendants,
+     user_id,
+      purpose,
+     event,
+     contactnumber,
+     *reservedItems 
+     * *quantity{id}
+     * */
+    try {
+      final ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+
+      params.add(new NameValuePair("user_id",userId));
+      params.add(new NameValuePair("dateStart",date));
+      params.add(new NameValuePair("timeStart",timeStart));
+      params.add(new NameValuePair("timeEnd",timeEnd));
+      params.add(new NameValuePair("event",event));
+      params.add(new NameValuePair("purpose",purpose));
+      params.add(new NameValuePair("attendants",attendants));
+      params.add(new NameValuePair("contactnumber",contactNumber));
+
+
+      params.add(new NameValuePair("venue",venue));
+
+      if(equipments != null && !equipments.isEmpty()) {
+        String reservedItems = "";
+        for(Equipment equipment: equipments) {
+          if(reservedItems.trim().isEmpty()){
+            reservedItems += equipment.getId();
+          }else {
+            reservedItems += ","+equipment.getId();
+          }
+          params.add(new NameValuePair("quantity"+equipment.getId(), ""+equipment.getReserved()));
+        }
+        params.add(new NameValuePair("reservedItems", reservedItems));
+      }
+
+      final String getPath;
+      getPath = mainUrl + "/apply?"+getQuery(params);
+
+      new RestAsyncTask(new RestAsyncTask.RestAsyncTaskListener() {
+
+        String jsonResults;
+
+        @Override
+        public void doInBackground() {
+          jsonResults = get(getPath, "POST", params);
         }
 
         @Override
