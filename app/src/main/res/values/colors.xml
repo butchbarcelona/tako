@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F5765</color>
-    <color name="colorPrimaryDark">#2B3A42</color>
-    <color name="colorAccent">#FF530D</color>
+    <color name="colorPrimary">#70B85D</color>
+    <color name="colorPrimaryDark">#2C5E2E</color>
+    <color name="colorAccent">#0C273D</color>
 
 
 
-    <color name="blue_dark">#2B3A42</color>
-    <color name="blue">#3F5765</color>
-    <color name="blue_light">#BDD4DE</color>
-    <color name="white">#EFEFEF</color>
-    <color name="red">#FF530D</color>
+    <color name="blue_dark">#2C5E2E</color>
+    <color name="blue">#70B85D</color>
+    <color name="blue_light">#0C273D</color>
+    <color name="white">#FFFEF1</color>
+    <color name="red">#54D0ED</color>
 </resources>

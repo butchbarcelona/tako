@@ -1,4 +1,4 @@
-package proj.tako.models;
+package proj.mtc.models;
 
 public class NameValuePair {
 

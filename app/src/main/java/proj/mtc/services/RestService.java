@@ -1,4 +1,4 @@
-package proj.tako.services;
+package proj.mtc.services;
 
 import android.util.Log;
 
@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import proj.tako.MainActivity;
-import proj.tako.models.Equipment;
-import proj.tako.models.NameValuePair;
+import proj.mtc.MainActivity;
+import proj.mtc.models.Equipment;
+import proj.mtc.models.NameValuePair;
 
 public class RestService {
 
@@ -75,7 +75,33 @@ public class RestService {
     }
   }
 
+  public void getReservations(final RestServiceListener listener){
 
+    final ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+    final String getPath;
+    getPath = mainUrl + "/reservation";
+
+    new RestAsyncTask(new RestAsyncTask.RestAsyncTaskListener() {
+
+      String jsonResults;
+
+      @Override
+      public void doInBackground() {
+        jsonResults = get(getPath, "GET", params);
+      }
+
+      @Override
+      public void result() {
+
+        if (jsonResults == null || jsonResults.trim().isEmpty()) {
+          listener.onFailure(RestCalls.GET_PENDING_LIST, "failed");
+        } else {
+          listener.onSuccess(RestCalls.GET_PENDING_LIST, jsonResults);
+        }
+
+      }
+    }).execute();
+  }
 
   public void getRooms(final RestServiceListener listener, String date, String timeStart, String timeEnd){
 
@@ -110,6 +136,35 @@ public class RestService {
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
+  }
+
+  public void getAllRooms(final RestServiceListener listener){
+
+      final ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+      final String getPath;
+      getPath = mainUrl + "/getReservableRooms";
+
+      new RestAsyncTask(new RestAsyncTask.RestAsyncTaskListener() {
+
+        String jsonResults;
+
+        @Override
+        public void doInBackground() {
+          jsonResults = get(getPath, "GET", params);
+        }
+
+        @Override
+        public void result() {
+
+          if (jsonResults == null || jsonResults.trim().isEmpty()) {
+            listener.onFailure(RestCalls.GET_ALL_ROOMS, "failed");
+          } else {
+            listener.onSuccess(RestCalls.GET_ALL_ROOMS, jsonResults);
+          }
+
+        }
+      }).execute();
+
   }
 
   public void getEquipment(final RestServiceListener listener, String date, String timeStart, String timeEnd){
@@ -195,7 +250,7 @@ public class RestService {
 
       Log.d(MainActivity.TAG, timeStart);
       Log.d(MainActivity.TAG, timeEnd);
-      params.add(new NameValuePair("dateStart",date));// + " " + timeStart));
+      params.add(new NameValuePair("dateStart", date));// + " " + timeStart));
       //params.add(new NameValuePair("dateEnd",date + " " + timeEnd));
       params.add(new NameValuePair("timeStart", timeStart));
       params.add(new NameValuePair("timeEnd", timeEnd));

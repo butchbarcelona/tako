@@ -3,8 +3,8 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="proj.mtc.RoomDetailsActivity">
     <item
-        android:id="@+id/action_reset"
+        android:id="@+id/action_logout"
         android:orderInCategory="100"
-        android:title="Reset"
+        android:title="Logout"
         app:showAsAction="never"/>
 </menu>

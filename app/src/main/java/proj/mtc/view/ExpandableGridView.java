@@ -1,4 +1,4 @@
-package proj.tako.view;
+package proj.mtc.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="proj.tako.RoomDetailsActivity"
+    tools:context="proj.mtc.RoomDetailsActivity"
     tools:showIn="@layout/activity_room_details">
     <FrameLayout
         android:layout_width="match_parent"
@@ -18,7 +18,23 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-    <LinearLayout
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:paddingLeft="3dp"
+                android:id="@+id/tv_hi"
+                android:text="" />
+
+        </LinearLayout>
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

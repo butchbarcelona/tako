@@ -1,4 +1,4 @@
-package proj.tako;
+package proj.mtc;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -36,14 +36,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import proj.tako.models.Equipment;
-import proj.tako.models.Reservation;
-import proj.tako.models.Room;
-import proj.tako.models.User;
-import proj.tako.services.RestCalls;
-import proj.tako.services.RestService;
-import proj.tako.services.Util;
-import proj.tako.view.ExpandableGridView;
+import proj.mtc.models.Equipment;
+import proj.mtc.models.Reservation;
+import proj.mtc.models.Room;
+import proj.mtc.models.User;
+import proj.mtc.services.RestCalls;
+import proj.mtc.services.RestService;
+import proj.mtc.services.Util;
+import proj.mtc.view.ExpandableGridView;
 
 public class RoomDetailsActivity extends AppCompatActivity {
 
@@ -55,6 +55,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
   ExpandableGridView gridViewEquipment;
   String eventDate, timeStart, timeEnd;
   LinearLayout llRoomsEquip;
+  TextView tvHi;
 
 
   ArrayList<Equipment> equipments;
@@ -65,6 +66,11 @@ public class RoomDetailsActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_room_details);
+
+/*
+    android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+*/
 
     loading = (RelativeLayout)findViewById(R.id.loading_layout);
     llRoomsEquip = (LinearLayout)findViewById(R.id.ll_rooms_equip);
@@ -88,9 +94,11 @@ public class RoomDetailsActivity extends AppCompatActivity {
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     toolbar.setTitle("MTC Reservation ");
-    toolbar.setSubtitle("Hi "+currUser.getFirstname());
+    toolbar.setSubtitle("Hi " + currUser.getFirstname());
     setSupportActionBar(toolbar);
 
+    tvHi = (TextView) findViewById(R.id.tv_hi);
+    tvHi.setText(currUser.getLastname()+ ", "+currUser.getFirstname()+" "+ currUser.getMiddlename());
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -118,7 +126,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
             }
           }
 
-
+          loading.setVisibility(View.VISIBLE);
 
           restService.reserveRoom(new RestService.RestServiceListener() {
             @Override
@@ -126,12 +134,14 @@ public class RoomDetailsActivity extends AppCompatActivity {
               Snackbar.make(view, "Room reservation is pending for approval.", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
               resetFields();
+              loading.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(RestCalls callType, String string) {
               Snackbar.make(view, "Could not connect to the server.", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+              loading.setVisibility(View.GONE);
             }
           }, currUser.getId() + ""
             , currReservation.getDate()
@@ -266,7 +276,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
             e.printStackTrace();
           }
 
-          //loading.setVisibility(View.GONE);
+          loading.setVisibility(View.GONE);
 
 
         }
@@ -466,6 +476,9 @@ public class RoomDetailsActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
         break;
+      case android.R.id.home:
+        onBackPressed();
+        return true;
     }
 
     return true;

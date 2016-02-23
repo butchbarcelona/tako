@@ -1,4 +1,4 @@
-package proj.tako;
+package proj.mtc;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -35,9 +35,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import proj.tako.services.RestCalls;
-import proj.tako.services.RestService;
-import proj.tako.services.Util;
+import proj.mtc.services.RestCalls;
+import proj.mtc.services.RestService;
+import proj.mtc.services.Util;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
   private UserLoginTask mAuthTask = null;
 
   // UI references.
-  private AutoCompleteTextView emailView;
+  private AutoCompleteTextView userNameView;
   private EditText passwordView;
   private View progressView;
   private View loginFormView;
@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_login);
     // Set up the login form.
-    emailView = (AutoCompleteTextView) findViewById(R.id.email);
+    userNameView = (AutoCompleteTextView) findViewById(R.id.username);
     populateAutoComplete();
 
     passwordView = (EditText) findViewById(R.id.password);
@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
       return true;
     }
     if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-      Snackbar.make(emailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+      Snackbar.make(userNameView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
         .setAction(android.R.string.ok, new View.OnClickListener() {
           @Override
           @TargetApi(Build.VERSION_CODES.M)
@@ -156,11 +156,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     // Reset errors.
-    emailView.setError(null);
+    userNameView.setError(null);
     passwordView.setError(null);
 
     // Store values at the time of the login attempt.
-    String email = emailView.getText().toString();
+    String email = userNameView.getText().toString();
     String password = passwordView.getText().toString();
 
     boolean cancel = false;
@@ -175,12 +175,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     // Check for a valid email address.
     if (TextUtils.isEmpty(email)) {
-      emailView.setError(getString(R.string.error_field_required));
-      focusView = emailView;
+      userNameView.setError(getString(R.string.error_field_required));
+      focusView = userNameView;
       cancel = true;
     } else if (!isEmailValid(email)) {
-      emailView.setError(getString(R.string.error_invalid_username));
-      focusView = emailView;
+      userNameView.setError(getString(R.string.error_invalid_username));
+      focusView = userNameView;
       cancel = true;
     }
 
@@ -284,7 +284,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
       new ArrayAdapter<>(LoginActivity.this,
         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-    emailView.setAdapter(adapter);
+    userNameView.setAdapter(adapter);
   }
 
 
@@ -326,7 +326,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             JSONObject result = new JSONObject(string);
 
             //goto MainActivity
-            Intent intent = new Intent(LoginActivity.this, RoomDetailsActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             intent.putExtra("firstname",result.getString("firstname"));
             intent.putExtra("id",result.getInt("id"));
             intent.putExtra("name",result.getInt("name"));
@@ -352,6 +352,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
           Util.getInstance().showDialog(LoginActivity.this, "Invalid credentials.", "OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
+              showProgress(false);
               dialog.dismiss();
             }
           });

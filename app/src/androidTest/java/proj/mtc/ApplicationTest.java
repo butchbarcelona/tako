@@ -1,4 +1,4 @@
-package proj.tako;
+package proj.mtc;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

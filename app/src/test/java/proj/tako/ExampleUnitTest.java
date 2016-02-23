@@ -1,4 +1,4 @@
-package proj.tako;
+package proj.mtc;
 
 import org.junit.Test;
 

@@ -1,10 +1,10 @@
-package proj.tako.services;
+package proj.mtc.services;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
-import proj.tako.MainActivity;
+import proj.mtc.MainActivity;
 
 /**
  * Created by tonnyquintos on 10/24/15.
@@ -49,12 +49,16 @@ public class Util {
 
     public void showDialog(Context ctx, String message, String okButton
       , DialogInterface.OnClickListener positiveListener ){
+      try {
         new AlertDialog.Builder(ctx)
           .setTitle(MainActivity.TAG)
           .setMessage(message)
           .setPositiveButton(okButton, positiveListener)
           .setIcon(android.R.drawable.ic_dialog_alert)
           .show();
+      }catch(Exception e){
+
+      }
     }
 
 
