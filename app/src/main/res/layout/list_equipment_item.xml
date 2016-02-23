@@ -21,8 +21,8 @@
         android:layout_gravity="center_horizontal"
         android:orientation="vertical"
         android:visibility="visible"
-        android:scaleX=".5"
-        android:scaleY=".5"/>
+        android:scaleX=".8"
+        android:scaleY=".8"/>
 
     <EditText
         android:layout_width="match_parent"

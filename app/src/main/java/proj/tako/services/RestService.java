@@ -188,11 +188,15 @@ public class RestService {
     try {
       final ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 
-      params.add(new NameValuePair("user_id",userId));
-      Log.d(MainActivity.TAG, date + " " + timeStart);
-      Log.d(MainActivity.TAG,date + " " + timeEnd);
-      params.add(new NameValuePair("dateStart",date + " " + timeStart));
-      params.add(new NameValuePair("dateEnd",date + " " + timeEnd));
+      params.add(new NameValuePair("user_id", userId));
+
+
+
+
+      Log.d(MainActivity.TAG, timeStart);
+      Log.d(MainActivity.TAG, timeEnd);
+      params.add(new NameValuePair("dateStart",date));// + " " + timeStart));
+      //params.add(new NameValuePair("dateEnd",date + " " + timeEnd));
       params.add(new NameValuePair("timeStart", timeStart));
       params.add(new NameValuePair("timeEnd", timeEnd));
       params.add(new NameValuePair("event",event));
@@ -336,9 +340,13 @@ public class RestService {
 
       result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
       result.append("=");
-      result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+      if(pair.getName().equals("timeEnd") || pair.getName().equals("timeStart") || pair.getName().equals("dateStart"))
+        result.append(pair.getValue());
+      else
+        result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
     }
 
+    Log.d(MainActivity.TAG,result.toString());
     return result.toString();
   }
 
